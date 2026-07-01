@@ -219,7 +219,8 @@
     exp.className = "explanation " + (correct ? "ok" : "ng");
     exp.innerHTML =
       '<div class="exp-head">' + (correct ? "正解！" : "不正解") + "</div>" +
-      '<div class="exp-body">' + escapeHtml(q.explanation || "") + "</div>";
+      '<div class="exp-body">' + escapeHtml(q.explanation || "") + "</div>" +
+      (q.source ? '<div class="exp-source">出典: ' + escapeHtml(q.source) + "</div>" : "");
     exp.classList.remove("hidden");
 
     var next = $("btn-next");

@@ -1,11 +1,12 @@
 /* Service Worker — オフラインでも使えるようにキャッシュする */
-var CACHE = "shikaku-tore-v1";
+var CACHE = "shikaku-tore-v2";
 var ASSETS = [
   "./",
   "./index.html",
   "./css/style.css",
   "./js/app.js",
   "./data/questions.js",
+  "./data/questions-ipa.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
