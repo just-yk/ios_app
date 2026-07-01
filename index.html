@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <title>資格合格トレーニング</title>
+  <meta name="description" content="IT系資格（基本情報技術者など）の学習・問題演習アプリ" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#4f46e5" />
+
+  <!-- iOS: ホーム画面に追加してフルスクリーン起動 -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="資格トレ" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- ホーム画面 -->
+    <section id="screen-home" class="screen">
+      <header class="app-header">
+        <h1 class="app-title">資格合格トレーニング</h1>
+        <p class="app-subtitle">IT系資格の問題演習</p>
+      </header>
+
+      <div class="stat-cards" id="home-stats"></div>
+
+      <div class="section-label">出題範囲</div>
+      <div class="category-list" id="category-list"></div>
+
+      <div class="section-label">モード</div>
+      <div class="mode-list">
+        <label class="switch-row">
+          <span>
+            <strong>間違えた問題だけ出題</strong>
+            <small id="wrong-count-note">復習モード</small>
+          </span>
+          <input type="checkbox" id="mode-review" />
+          <span class="switch"></span>
+        </label>
+        <label class="switch-row">
+          <span>
+            <strong>出題順をシャッフル</strong>
+            <small>毎回ランダムに並べ替え</small>
+          </span>
+          <input type="checkbox" id="mode-shuffle" checked />
+          <span class="switch"></span>
+        </label>
+      </div>
+
+      <button id="btn-start" class="btn btn-primary btn-lg">学習をはじめる</button>
+      <button id="btn-reset" class="btn btn-ghost">学習データをリセット</button>
+      <p class="footer-note">オフライン対応 PWA ・ ホーム画面に追加してアプリのように使えます</p>
+    </section>
+
+    <!-- 問題画面 -->
+    <section id="screen-quiz" class="screen hidden">
+      <header class="quiz-top">
+        <button id="btn-quit" class="icon-btn" aria-label="中断">✕</button>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+          <div id="progress-text" class="progress-text">1 / 10</div>
+        </div>
+      </header>
+
+      <div class="quiz-body">
+        <div id="q-meta" class="q-meta"></div>
+        <div id="q-text" class="q-text"></div>
+        <div id="choices" class="choices"></div>
+        <div id="explanation" class="explanation hidden"></div>
+      </div>
+
+      <div class="quiz-actions">
+        <button id="btn-next" class="btn btn-primary btn-lg hidden">次へ</button>
+      </div>
+    </section>
+
+    <!-- 結果画面 -->
+    <section id="screen-result" class="screen hidden">
+      <div class="result-hero">
+        <div id="result-emoji" class="result-emoji">🎉</div>
+        <div id="result-score" class="result-score">0 / 0</div>
+        <div id="result-rate" class="result-rate">正答率 0%</div>
+      </div>
+      <div id="result-breakdown" class="result-breakdown"></div>
+      <div class="result-actions">
+        <button id="btn-retry-wrong" class="btn btn-primary btn-lg">間違えた問題を復習</button>
+        <button id="btn-home" class="btn btn-ghost btn-lg">ホームに戻る</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="data/questions.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
