@@ -28,6 +28,24 @@ python3 tools/pdf_to_questions.py \
 生成された `tools/out/fe-r01a.js` を確認し、問題なければ中身を
 `data/questions-ipa.js` の `list` に貼り付けます（`source`＝出典は自動で入ります）。
 
+### URL から直接ダウンロードして変換
+
+`--pdf` / `--answers` には**ローカルパスの代わりに URL** を渡せます。
+IPA公式のPDF URL を指定すれば、ダウンロード〜変換をまとめて実行します。
+
+```bash
+python3 tools/pdf_to_questions.py \
+    --pdf     "https://www.ipa.go.jp/.../xxxx_am_qs.pdf" \
+    --answers "https://www.ipa.go.jp/.../xxxx_am_ans.pdf" \
+    --term "令和元年度 秋期" --id-prefix fe-r01a \
+    --out tools/out/fe-r01a.js
+```
+
+> ⚠️ ネットワークが制限された環境（Claude Code on the web の一部設定など）では
+> IPAへ接続できずダウンロードに失敗します。その場合は、
+> **ネット接続のあるPCでこのコマンドを実行**するか、
+> PDFをこのリポジトリにコミットしてローカルパスで指定してください。
+
 ### 解答ファイル（`--answers`）の書式
 
 いずれでもOK。省略すると `answer` は `null`（後で手入力）。
