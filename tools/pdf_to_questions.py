@@ -32,6 +32,8 @@ import json
 import os
 import re
 import sys
+import tempfile
+import urllib.request
 
 try:
     import fitz  # PyMuPDF
@@ -54,6 +56,29 @@ REVIEW_HINTS = [
 ]
 
 Z2H = str.maketrans("０１２３４５６７８９", "0123456789")
+
+
+def resolve_source(path):
+    """path が URL ならダウンロードして一時ファイルのパスを返す。ローカルパスはそのまま。"""
+    if not path or not re.match(r"^https?://", path):
+        return path, None
+    sys.stderr.write("ダウンロード中: %s\n" % path)
+    suffix = os.path.splitext(path.split("?")[0])[1] or ".bin"
+    req = urllib.request.Request(path, headers={"User-Agent": "Mozilla/5.0 (pdf_to_questions)"})
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            tmp.write(resp.read())
+        tmp.close()
+    except Exception as e:
+        tmp.close()
+        os.unlink(tmp.name)
+        sys.exit(
+            "ダウンロードに失敗しました: %s\n  %s\n"
+            "  ※この実行環境は外部Webが遮断されている場合があります。"
+            "その場合はPDFをローカルに保存してパスを指定するか、ネット接続のあるPCで実行してください。"
+            % (path, e))
+    return tmp.name, tmp.name
 
 
 def extract_lines(pdf_path):
@@ -207,8 +232,8 @@ def build_js(questions, answers, args):
 
 def main():
     ap = argparse.ArgumentParser(description="IPA午前PDF → 問題JS 変換")
-    ap.add_argument("--pdf", required=True, help="午前問題のPDFパス")
-    ap.add_argument("--answers", help="解答ファイル(.txt/.json/.pdf)")
+    ap.add_argument("--pdf", required=True, help="午前問題のPDF（ローカルパス または http(s) URL）")
+    ap.add_argument("--answers", help="解答ファイル(.txt/.json/.pdf)。URLも可")
     ap.add_argument("--exam", default="基本情報技術者試験")
     ap.add_argument("--term", required=True, help='例: "令和元年度 秋期"')
     ap.add_argument("--section", default="午前")
@@ -219,10 +244,23 @@ def main():
     ap.add_argument("--out", help="出力先JSパス（省略時は標準出力）")
     args = ap.parse_args()
 
-    lines = extract_lines(args.pdf)
-    questions = parse_questions(lines)
-    answers = load_answers(args.answers)
-    js, stats = build_js(questions, answers, args)
+    # URL 指定ならダウンロードしてから処理（後片付け用に一時ファイル名を控える）
+    tmp_files = []
+    pdf_path, t1 = resolve_source(args.pdf)
+    ans_path, t2 = resolve_source(args.answers)
+    tmp_files += [t for t in (t1, t2) if t]
+
+    try:
+        lines = extract_lines(pdf_path)
+        questions = parse_questions(lines)
+        answers = load_answers(ans_path)
+        js, stats = build_js(questions, answers, args)
+    finally:
+        for t in tmp_files:
+            try:
+                os.unlink(t)
+            except OSError:
+                pass
 
     if args.out:
         os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
